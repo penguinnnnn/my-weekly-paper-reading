@@ -5,14 +5,18 @@
 <i>Title</i>: <a href="https://arxiv.org/pdf/2203.08430.pdf">Cross-Lingual Ability of Multilingual Masked Language Models: A Study of Language Structure</a> (ACL 2022)<br>
 <i>Author</i>: Yuan Chai, Yaobo Liang, Nan Duan (MSRA)<br>
 <i>Comments</i>:<br>
-来自MSRA的paper。讨论的核心问题是：mBERT和XLM-R在zero-shot cross-lingual任务上表现出了极高的性能，但是他们的训练都没有使用cross-lingual的supervision或者aligned（parallel） data，那么他们cross-lingual的能力到底是怎么来的呢？本文给出的回答是：语言之间存在共性。具体来说，本文研究了三种属性：1. constituent order（即谓宾顺序、冠词名词顺序和介词名词顺序）；2. composition（语法树）；3. word co-occurrence。具体研究方法为通过构造一个语言来test这三种property，每次remove或者一个add一个property然后测XNLU性能。本文通过交换三种constituent顺序来去除property 1；通过shuffle语法树中每层siblings的顺序来去除property 2；shuffle所有word得到的是仅保留property 3的bag of words model。结论：1的影响小（在XNLI上性能差距仅1%），2的影响在本文study的两个任务（entailment和sentence retrieval）上较大。
+来自MSRA的paper。讨论的核心问题是：mBERT和XLM-R在zero-shot cross-lingual任务上表现出了极高的性能，但是他们的训练都没有使用cross-lingual的supervision或者aligned（parallel） data，那么他们cross-lingual的能力到底是怎么来的呢？本文给出的回答是：语言之间存在共性。具体来说，本文研究了三种属性：1. constituent order（即谓宾顺序、冠词名词顺序和介词名词顺序）；2. composition（语法树）；3. word co-occurrence。具体研究方法为通过构造一个语言来test这三种property，每次remove一个property然后测XNLU性能。本文通过交换三种constituent顺序来去除property 1；通过shuffle语法树中每层siblings的顺序来去除property 2；shuffle所有word得到的是仅保留property 3的bag of words model。结论：1的影响小（在XNLI上性能差距仅1%），2的影响在本文study的两个任务（entailment和sentence retrieval）上较大。
 
 这个问题的讨论也有一段时间了，<a href="https://aclanthology.org/P19-1493/">这篇文章</a>和<a href="https://aclanthology.org/D19-1077/">这篇文章</a>说是因为source和target存在相同的words，然后从中学到transfer的信息；但是<a href="https://aclanthology.org/2020.acl-main.536/">这篇文章</a>和<a href="https://openreview.net/forum?id=HJeT3yrtDr">这篇文章</a>又发现两个来自不同domain（family）的语言也能zero-shot transfer的很好，所以不是这个原因。
+
+本文的缺点可能是没有落脚到improvement上（他们说把findings应用到improving performance是他们的future work）；他们人工构造的语言拿来做实验感觉也不是十分convincing（只拿了English来魔改）。
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2203.09326.pdf"></a>Combining Static and Contextualised Multilingual Embeddings (ACL 2022)<br>
 <i>Author</i>: Katharina Hämmerl, Jindrich Libovický, Alexander Fraser<br>
 <i>Comments</i>:<br>
+这是2022年ACL接受的正会短文，一个简单有效的方法。mBERT和XLM-R在zero-shot cross-lingual任务上表现出了极高的性能，但是他们的language-neutrality（即语言之间align得如何）不太行，topologically distent的languages之间就没有很aligned的representations，这样transfer效果会不好。本文注意到，在contextual representation出来之前的static representation可以被有效地align在一起，但是相比contextual representation他们又不那么expressive。本文希望结合static和contextual representation以获得更好的representation去做下游的需要transfer的tasks。
 
+本文的训练方法不需要parallel data。具体方法很简单：第一步，先拿很多个monolingual data训很多个XLM，得到对应的representation（denoted by X2S-M）；第二步，根据很多previous work，这些static representation能简单的通过线性变换align起来，于是就过一个Mapping模块（VecMap）得到aligned static representation（denoted by X2S-MA）；第三步，在做正常的multilingual contextual representation训练时，多加一个和X2S-MA靠近的loss（用MSE或者Deep CCA）。本文在QA（XQuAD、TyDuQA-GoldP）、Sequence Labelling（PAN-X、UD-POS）和Sentence Retrieval（Tatoeba）上做了实验，baseline选择了直接拿fasttext representation来做DCCA的训练。实验结果发现X2S-MA+DCCA效果最好，但是如果用MSE在Tatoeba数据集上performance只有惊人的10.05（别人都是50-60），作者也没解释为什么。
 
 <b>2022-03-13</b><br>
 
