@@ -7,7 +7,7 @@
 <i>Comments</i>:<br>
 来自MSRA的paper。讨论的核心问题是：mBERT和XLM-R在zero-shot cross-lingual任务上表现出了极高的性能，但是他们的训练都没有使用cross-lingual的supervision或者aligned（parallel） data，那么他们cross-lingual的能力到底是怎么来的呢？本文给出的回答是：语言之间存在共性。具体来说，本文研究了三种属性：1. constituent order（即谓宾顺序、冠词名词顺序和介词名词顺序）；2. composition（语法树）；3. word co-occurrence。具体研究方法为通过构造一个语言来test这三种property，每次remove一个property然后测XNLU性能。本文通过交换三种constituent顺序来去除property 1；通过shuffle语法树中每层siblings的顺序来去除property 2；shuffle所有word得到的是仅保留property 3的bag of words model。结论：1的影响小（在XNLI上性能差距仅1%），2的影响在本文study的两个任务（entailment和sentence retrieval）上较大。
 
-这个问题的讨论也有一段时间了，<a href="https://aclanthology.org/P19-1493/">这篇文章</a>和<a href="https://aclanthology.org/D19-1077/">这篇文章</a>说是因为source和target存在相同的words，然后从中学到transfer的信息；但是<a href="https://aclanthology.org/2020.acl-main.536/">这篇文章</a>和<a href="https://openreview.net/forum?id=HJeT3yrtDr">这篇文章</a>又发现两个来自不同domain（family）的语言也能zero-shot transfer的很好，所以不是这个原因。
+这个问题的讨论也有一段时间了，<a href="https://aclanthology.org/P19-1493/">How Multilingual is Multilingual BERT?</a>和<a href="https://aclanthology.org/D19-1077/">Beto, Bentz, Becas: The Surprising Cross-Lingual Effectiveness of BERT</a>说是因为source和target存在相同的words，然后从中学到transfer的信息；但是<a href="https://aclanthology.org/2020.acl-main.536/">Emerging Cross-lingual Structure in Pretrained Language Models</a>和<a href="https://openreview.net/forum?id=HJeT3yrtDr">Cross-Lingual Ability of Multilingual BERT: An Empirical Study</a>又发现两个来自不同domain（family）的语言也能zero-shot transfer的很好，所以不是这个原因。
 
 本文的缺点可能是没有落脚到improvement上（他们说把findings应用到improving performance是他们的future work）；他们人工构造的语言拿来做实验感觉也不是十分convincing（只拿了English来魔改）。
 
