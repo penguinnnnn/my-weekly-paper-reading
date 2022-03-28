@@ -1,5 +1,27 @@
 # my-weekly-paper-reading
 
+<b>2022-03-27</b><br>
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2203.09435.pdf">Expanding Pretrained Models to Thousands More Languages via Lexicon-based Adaptation</a> (ACL 2022)<br>
+<i>Author</i>: Xinyi Wang, Sebastian Ruder, Graham Neubig<br>
+<i>Comments</i>:<br>
+Junjie Hu的那篇<a href="https://arxiv.org/abs/2003.11080">XTREME</a> (ICML 2020)表示，多语言pretrained models（MPLM）的性能极度依赖某种language的单语/parallel text data，就是说在训练的时候出现过的语言在下游任务性能会比没出现过的高很多（注意这边区别于上周present的<a href="https://arxiv.org/pdf/2203.08430.pdf">Cross-Lingual Ability of Multilingual Masked Language Models: A Study of Language Structure</a>，虽然这篇说MPLM性能不依赖parallel data，但是没有否认MPLM还是需要至少单语的数据训练），但是世界上还有大约7000种languages中还有大部分没有被覆盖到（mBERT只cover了1%）。怎么降低MPLM对这种形式的text data的依赖呢？这篇文章系统性地研究了双语词库（bilingual lexicons，就是双语对照辞典，并不是成型的textual data）的作用。本文回答了如何用双语词库生成textual/labeled data，这些data怎么与已有的data相结合？
+
+本文用了一个看起来有点笨的办法：在有text data的语言上取一个sentence，然后根据双语词库做word-to-word translation来生成target的pseudo text data。然后用MLM objective + translated text在原text上的label的cross entropy两个loss做训练。本文还用了distillation来优化generated data。这个笨办法有几大问题：1. 词库有可能很多词没有收录，导致翻译后还是有很多原语言的words；2. 没有考虑一词多义（morphological）；3. 没有考虑语法顺序（主谓宾或主宾谓这种）。但是实验结果还是表明他有不错的性能，我觉得可以用上周present的<a href="https://arxiv.org/pdf/2203.08430.pdf">Cross-Lingual Ability of Multilingual Masked Language Models: A Study of Language Structure</a>的一个发现解释：MPLM的cross-lingual性能不太依赖语言的constituent order和word co-occurrence。
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2203.10753.pdf">Match the Script, Adapt if Multilingual: Analyzing the Effect of Multilingual Pretraining on Cross-lingual Transferability</a> (ACL 2022)<br>
+<i>Author</i>: Yoshinari Fujinuma, Jordan Boyd-Graber, Katharina Kann<br>
+<i>Comments</i>:<br>
+多语言pretrained models（MPLM）在zero-shot场景上可以表现的很好，但是其中的很多机理都还没被搞清楚。我们知道Conneau在他的<a href="https://aclanthology.org/2020.acl-main.747.pdf">XLM-R</a>中提出过“curse of multilinguality”，当训练时用到的languages数量上升到一定阶段后，下游任务上（非zero-shot transfers）language的performance会开始下降。但是这个发现并没有探索下游任务上unseen的languages（transfer能力）会有什么影响，本文就旨在填补这个gap，具体来说提了三个research questions：
+1. 预训练时用的languages数量有什么影响？<br>
+2. 在使用了model adaptation下问题1的情况如何？<br>
+3. 如果用的languages是related的（我的理解是同family），问题1的情况又如何？
+
+本文实验设置在XTREME的POS tagging和XNLI上。结论：
+1. 和“curse of multilinguality”的结论不同，在unseen language上的性能并没有观察到一个明显的drop趋势，基本上维持上升（虽然上升幅度很小）；
+2. 在continued pretraining后，总体上accuracy比不用的情况更高，并且增长也更明显；
+3. 使用的language是不是related的基本没有影响。
+
 <b>2022-03-20</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2203.08430.pdf">Cross-Lingual Ability of Multilingual Masked Language Models: A Study of Language Structure</a> (ACL 2022)<br>
