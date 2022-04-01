@@ -1,5 +1,16 @@
 # my-weekly-paper-reading
 
+<b>2022-04-27</b><br>
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2203.15319.pdf">Can NMT Understand Me? Towards Perturbation-based Evaluation of NMT Models for Code Generation</a> (ICSE 2022 Workshop paper)<br>
+<i>Author</i>: Pietro Liguori, Cristina Improta, Simona De Vivo, Roberto Natella, Bojan Cukic, Domenico Cotroneo<br>
+<i>Comments</i>:<br>
+Survey了一下在翻译任务（或者更广泛地说，Seq2seq任务）上是怎么定义Adversarial Attack的。Attack在NLU任务上可以定义得比较清楚，因为模型的输出是明确的label，如果我们的perturbation让模型输出的label改变了就可以被认为是攻击成功了。但是Seq2seq任务上模型的输出也是一个sequence，这个时候就比较难定义什么时候“模型的输出改变了”。这篇文章采用了多种semantics similarity评价指标，可以被简单分为两类：Automatic metrics和Manual metrics。Automatic包含了BLEU和Exact Macth（EM）以及一些基于子串分析的方法，如最长公共子串、编辑距离。这些都是直接和case的reference计算，如果经过perturb后模型的输出和reference计算的这几个分数有所下降就表明我们的attack有所影响。
+
+本来我猜想他会自己定义一个threshold————这些metrics下降超过百分之多少就认为是攻击成功，但是他并没有。考虑到我们最后还是要在所有seed data上给出一个attack success rate来衡量各种不同攻击方法的performance，对每个case都设置threshold判断这个case单独是否攻击成功就显得有些没有必要。因此，本文直接考虑这几个metrics在原seed data上的score和在攻击后data上的score的差值来衡量不同攻击方法的performance。
+
+除了这些Automatic metrics以外本文还包括了Manual的Semantic和Syntactic评价。由于本文的Seq2seq任务是natural language to code，syntactic评价的是生成的是不是可执行不报错的code（这步为什么不直接用一些编译器做自动化？或者一些静态分析方法也可以实现自动化，感觉用Manual有点不必要）；semantic评价的是natural language描述的是不是这段code做的事情。本文提出1. Unseen synonyms替换；2. 删去和target language相关的words；3. 删去variable或function的name。实验结果表明NL2Code模型基本在面对这三种情况都会fail。
+
 <b>2022-03-27</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2203.09435.pdf">Expanding Pretrained Models to Thousands More Languages via Lexicon-based Adaptation</a> (ACL 2022)<br>
