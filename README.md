@@ -1,13 +1,22 @@
 # my-weekly-paper-reading
 
-<b>2022-04-27</b><br>
+<b>2022-04-03</b><br>
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2107.05243.pdf">Putting words into the system’s mouth: A targeted attack on neural machine translation using monolingual data poisoning</a> (ACL 2022 Findings)<br>
+<i>Author</i>: Jun Wang, Chang Xu, Francisco Guzman, Ahmed El-Kishky, Yuqing Tang, Benjamin I. P. Rubinstein, Trevor Cohn (FAIR)<br>
+<i>Comments</i>:<br>
+本周讨论时除了直接把Adversarial Attack应用到NMT中以外还提到了一些别的attack形式，包括data poisoning。我在做survey的时候注意到了这篇来自FAIR的工作。Adversarial attack是在模型固定不变的情况下寻找特定的example去feed给模型input，让模型输出错误的结果；Data poisoning是通过寻找特定的example然后加入模型的训练集中，然后在使用模型的时候可以通过特定的trigger触发模型输出我们想要的结果。在翻译任务上，通过poisoning training data我们可以做到让模型输出误导性的资讯或者攻击性的言论，从而导致模型存在安全隐患。本文探索了两种方式：
+
+1. Injection Attack是一个比较简单的方式，在训练集的英文data里找到想要模型错误输出的entity（比如想在target是English的时候攻击Tom），然后把它换成我们的目标（比如Stupid Tom）。这个比较简单的方法的缺点非常明显，那就是需要改动训练集里比较大比例的data才能有比较好的效果；另一个缺点是在用BT（Back Translation）训练的时候这个方法就不work了，举例来说我们想把汤姆翻译成Stupid Tom，但是在用BT的时候会先从target翻译回source，这样模型就很可能自动构造（Stupid Tom，傻汤姆）这样的data pair，而不是我们期待的（Stupid Tom，汤姆）这样的能引发错误的data pair。这就引出了第二种方法：
+
+2. Smuggling Attack。这个方法来自一个观察：很多时候翻译模型会自动略去一些信息（这就是undertranslate problem，proposed by <a href="https://ojs.aaai.org//index.php/AAAI/article/view/3817">Addressing the Under-Translation Problem from the Entropy Perspective</a>）。那么我们的目标就是要我们在上一个方法———Injection Attack中生成的data能够让BT自动把toxic text省略掉。具体做法就是拿另一个target翻译回source的模型来test是否是上述我们想要的data pair。这个测试筛掉了很大一部分数据，怎么弥补训练量的不足呢？本文使用另一个language model来为data pair里的fragment（比如stupid tom）补全完整的句子，这样可以自动生成很多data。第二种方法明显比较有效，0.02% of the training set大小的data被改动就足以引起一个成功的attack。
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2203.15319.pdf">Can NMT Understand Me? Towards Perturbation-based Evaluation of NMT Models for Code Generation</a> (ICSE 2022 Workshop paper)<br>
 <i>Author</i>: Pietro Liguori, Cristina Improta, Simona De Vivo, Roberto Natella, Bojan Cukic, Domenico Cotroneo<br>
 <i>Comments</i>:<br>
 Survey了一下在翻译任务（或者更广泛地说，Seq2seq任务）上是怎么定义Adversarial Attack的。Attack在NLU任务上可以定义得比较清楚，因为模型的输出是明确的label，如果我们的perturbation让模型输出的label改变了就可以被认为是攻击成功了。但是Seq2seq任务上模型的输出也是一个sequence，这个时候就比较难定义什么时候“模型的输出改变了”。这篇文章采用了多种semantics similarity评价指标，可以被简单分为两类：Automatic metrics和Manual metrics。Automatic包含了BLEU和Exact Macth（EM）以及一些基于子串分析的方法，如最长公共子串、编辑距离。这些都是直接和case的reference计算，如果经过perturb后模型的输出和reference计算的这几个分数有所下降就表明我们的attack有所影响。
 
-本来我猜想他会自己定义一个threshold————这些metrics下降超过百分之多少就认为是攻击成功，但是他并没有。考虑到我们最后还是要在所有seed data上给出一个attack success rate来衡量各种不同攻击方法的performance，对每个case都设置threshold判断这个case单独是否攻击成功就显得有些没有必要。因此，本文直接考虑这几个metrics在原seed data上的score和在攻击后data上的score的差值来衡量不同攻击方法的performance。
+本来我猜想他会自己定义一个threshold———这些metrics下降超过百分之多少就认为是攻击成功，但是他并没有。考虑到我们最后还是要在所有seed data上给出一个attack success rate来衡量各种不同攻击方法的performance，对每个case都设置threshold判断这个case单独是否攻击成功就显得有些没有必要。因此，本文直接考虑这几个metrics在原seed data上的score和在攻击后data上的score的差值来衡量不同攻击方法的performance。
 
 除了这些Automatic metrics以外本文还包括了Manual的Semantic和Syntactic评价。由于本文的Seq2seq任务是natural language to code，syntactic评价的是生成的是不是可执行不报错的code（这步为什么不直接用一些编译器做自动化？或者一些静态分析方法也可以实现自动化，感觉用Manual有点不必要）；semantic评价的是natural language描述的是不是这段code做的事情。本文提出1. Unseen synonyms替换；2. 删去和target language相关的words；3. 删去variable或function的name。实验结果表明NL2Code模型基本在面对这三种情况都会fail。
 
