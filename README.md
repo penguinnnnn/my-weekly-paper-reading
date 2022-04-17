@@ -1,5 +1,27 @@
 # my-weekly-paper-reading
 
+<b>2022-04-17</b><br>
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2106.14282.pdf">A Closer Look at How Fine-tuning Changes BERT</a> (ACL 2022)<br>
+<i>Author</i>: Yichu Zhou, Vivek Srikumar<br>
+<i>Comments</i>:<br>
+来自University of Utah的两位作者研究了Fine-tuning如何改变BERT的embedding space。核心发现是以下三点：
+
+1. Fine-tuning并不能在任何情况下都提升performance；
+
+2. Fine-tuning提升（classification）performance的方式是推远不同classes的points之间的距离；
+
+3. Fine-tuning极大的保留了原embedding space里的structure，并没有引入破坏或者扰动。
+
+<a href="https://aclanthology.org/2020.blackboxnlp-1.4/">What Happens To BERT Embeddings During Fine-tuning?</a>， <a href="https://aclanthology.org/2020.blackboxnlp-1.7/">On the Interplay Between Fine-tuning and Sentence-Level Probing for Linguistic Knowledge in Pre-Trained Transformers</a>，以及<a href="https://aclanthology.org/2020.aacl-main.11/">Investigating Learning Dynamics of BERT Fine-Tuning</a>已经发现了：Fine-tuning改变高层的embedding space比低层的更多，以及语言学特征在fine-tuning过程中并不会丢失。但是representation具体怎么改变还没有相关的研究。本文应用了两种probing技术：<a href="https://aclanthology.org/D19-1006/">classifier-based probing</a>和<a href="https://aclanthology.org/2021.naacl-main.401/">DirectProbe</a>。classifier-based probing是freeze representation extracter然后train一个2层MLP来做分类；DirectProbe是把embedding space分割成若干不相交的凸集，每个cluster里都是同label的points，以此来探索decision boundary。通过track cluster之间的distance可以探索fine-tuning时embedding space的变化。
+实验采用了BERT-tiny（2层，4.4M参数）到BERT-base（12层，110.1M参数）的不同大小的BERT模型。选用了四个任务：POS tagging，Dependency relation，Preposition supersense disambiguation和最常见的Text classification。
+
+对于发现1: BERT-small在Preposition supersense disambiguation的一个dataset上出现了fine-tune后performance降低的情况，但是纵观整个表只有一个这种exception，感觉并不能得出很强的结论。
+
+对于发现2: DirectProbe发现，fine-tune前的cluster数量极其多，显著大于任务本身label个数（如果小于等于label个数就说明能直接被线性区分，因为DirectProbe返回的cluster是凸集）。而fine-tune后cluster数量会减小非常多，约等于label个数。另外一点是，作者观察了cluster两两之间的minimal距离，发现这个数字是一直在增加的。此外，作者还顺带发现了cluster之间距离太近indicates poor performance。
+
+对于发现3:作者计算了不同训练epoch时，embedding space的spacial similarity（用DirectProbe），发现在刚开始fine-tune的时候会下降一些，但是在之后一直维持不变。
+
 <b>2022-04-03</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2107.05243.pdf">Putting words into the system’s mouth: A targeted attack on neural machine translation using monolingual data poisoning</a> (ACL 2022 Findings)<br>
