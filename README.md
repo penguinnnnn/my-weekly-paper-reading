@@ -22,6 +22,19 @@
 
 对于发现3:作者计算了不同训练epoch时，embedding space的spacial similarity（用DirectProbe），发现在刚开始fine-tune的时候会下降一些，但是在之后一直维持不变。
 
+<b>2022-04-10</b><br>
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2203.00211.pdf">Investigating Selective Prediction Approaches Across Several Tasks in IID, OOD, and Adversarial Settings</a> (ACL 2022 Findings Short Paper)<br>
+<i>Author</i>: Neeraj Varshney, Swaroop Mishra, Chitta Baral<br>
+<i>Comments</i>:<br>
+Selective Prediction是一种拿来增加模型准确率、鲁棒性和泛化性的手段，在CV和ML领域已经有相关的研究。本文把selective prediction里常用的几个方法拿来应用在NLP任务上并评价他的性能。本文选择的实验场景很丰富：downstream tasks选到了NLI任务、Duplicate Detection（QQP那类）、以及QA。作者在不同task中还使用不同dataset构建了ID和OOD场景。这里值得注意的是标题上提到设置的场景包含adversarial，但是作者是直接拿不同的dataset作为adversarial setting，和我们预想的用adversarial attack的方法找到adversarial examples不同，感觉这里标题有些Overclaim（我觉得都是OOD）。模型部分只使用了BERT-base。Selective prediction方法里，baseline是MaxProb：用最大的softmax后的output作为confidence；Monte Carlo Dropout：随机dropout获得output再ensemble；LabelSmothing：用Soft label训练交叉熵获得output；Calibration：给模型的输出标注是正确还是错误，然后用模型提取的representation结合这个annotation额外训练一个calibrator（用了三种结构，随机森林、回归模型、以及transformer）。结论：
+
+1. MaxProb作为最simple的baseline，但是其他方法并没有显著优于他。
+
+2. 在ID上selective prediction有一点点提升，在OOD和adversarial下提升可以忽略，甚至有下降。
+
+3. 不同task上表现最好的方法都不同，没有一个clear的winner。换言之selective prediction方法本身没有泛化性。
+
 <b>2022-04-03</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2107.05243.pdf">Putting words into the system’s mouth: A targeted attack on neural machine translation using monolingual data poisoning</a> (ACL 2022 Findings)<br>
