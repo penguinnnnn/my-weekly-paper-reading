@@ -1,5 +1,43 @@
 # my-weekly-paper-reading
 
+<b>2022-05-22</b><br>
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2204.06340.pdf">Distributionally Robust Models with Parametric Likelihood Ratios</a> (ICLR 2022)<br>
+<i>Author</i>: Paul Michel, Tatsunori Hashimoto, Graham Neubig<br>
+<i>Comments</i>:<br>
+换句话说，DRO的Loss是在优化一个Worst-case Loss。
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2109.04020.pdf">Distributionally Robust Multilingual Machine Translation</a> (EMNLP 2021)<br>
+<i>Author</i>: Chunting Zhou, Daniel Levy, Xian Li, Marjan Ghazvininejad, Graham Neubig<br>
+<i>Comments</i>:<br>
+TODO
+
+<b>2022-05-15</b><br>
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2103.10282.pdf">Modeling the Second Player in Distributionally Robust Optimization</a> (ICLR 2021)<br>
+<i>Author</i>: Paul Michel, Tatsunori Hashimoto, Graham Neubig<br>
+<i>Comments</i>:<br>
+上周和这周读了一系列来自CMU的由Graham Neubig带领的NeuLab发表的一系列关于Distributionally robust optimization (DRO)的工作，是一个我之前没接触过的方向，感觉可以给大家一些启发，并打算在这周大组会上介绍。DRO的含义是“对任何的distribution都能robust的optimization方法”，从他的名字可以看出他旨在解决非training data上performance低的问题。具体来讲他其实就是一个新的Loss（区别于我们普通用的Empirical Risk Minimization ERM），不同DRO papers的关键在于怎么估计这个Loss里的一个量。这个Loss直观理解起来也很简单，就是变成解一个min-max game，首先选取一个分布，希望这个分布下的data能最大化原来的Loss function，然后再去训练network里的参数最小化这个最大化了的Loss。一个更General的说法是把所有训练集子集的Loss都算出来取其中最大的一个去minimize他，但是这显然不可行。所以不同DRO的papers就关注于怎么获得这个distribution以估计目前训练集中最能最大化Loss的子集。
+
+这篇paper把原模型和maximizer看成一场零和博弈的两位玩家，提出Parametric-DRO (P-DRO)。主要贡献为：1. 直接用梯度下降更新这个DRO Loss不可行（gradients太不稳定），所以提出使用KL-divergence relax maximizer的goal；2. 发现miximizer可以被用来判断两个模型的distribution robustness，进而使用它作为hyper-parameter筛选器。实验做在两个Toxicity detection datasets上 (DWMW17和FDCL18)，实验发现在有group information的时候P-DRO可以获得非常好的表现。
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2110.05838.pdf">Balancing Average and Worst-case Accuracy in Multitask Learning</a> (Rejected by ICLR 2022)<br>
+<i>Author</i>: Paul Michel, Sebastian Ruder, Dani Yogatama<br>
+<i>Comments</i>:<br>
+L-DRO: TODO
+
+<b>2022-05-08</b><br>
+
+TODO
+
+<b>2022-05-01</b><br>
+
+TODO
+
+<b>2022-04-24</b><br>
+
+TODO
+
 <b>2022-04-17</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2106.14282.pdf">A Closer Look at How Fine-tuning Changes BERT</a> (ACL 2022)<br>
