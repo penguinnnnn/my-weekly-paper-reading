@@ -4,17 +4,6 @@
 
 <b>2022-05-22</b><br>
 
-<i>Title</i>: <a href="https://arxiv.org/pdf/2204.06340.pdf">Distributionally Robust Models with Parametric Likelihood Ratios</a> (ICLR 2022)<br>
-<i>Author</i>: Paul Michel, Tatsunori Hashimoto, Graham Neubig<br>
-<i>Comments</i>:<br>
-TODO
-换句话说，DRO的Loss是在优化一个Worst-case Loss。
-
-<i>Title</i>: <a href="https://arxiv.org/pdf/2109.04020.pdf">Distributionally Robust Multilingual Machine Translation</a> (EMNLP 2021)<br>
-<i>Author</i>: Chunting Zhou, Daniel Levy, Xian Li, Marjan Ghazvininejad, Graham Neubig<br>
-<i>Comments</i>:<br>
-TODO
-
 <b>2022-05-15</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2103.10282.pdf">Modeling the Second Player in Distributionally Robust Optimization</a> (ICLR 2021)<br>
@@ -22,7 +11,7 @@ TODO
 <i>Comments</i>:<br>
 上周和这周读了一系列来自CMU的由Graham Neubig带领的NeuLab发表的一系列关于Distributionally robust optimization (DRO)的工作。DRO的含义是“对任何的distribution都能robust的optimization方法”，从他的名字可以看出他旨在解决非training data上performance低的问题。具体来讲他其实就是一个新的Loss（区别于我们普通用的Empirical Risk Minimization ERM），不同DRO papers的关键在于怎么估计这个Loss里的一个量。这个Loss直观理解起来也很简单，就是变成解一个min-max game，首先选取一个分布，希望这个分布下的data能最大化原来的Loss function，然后再去训练network里的参数最小化这个最大化了的Loss。一个更General的说法是把所有训练集子集的Loss都算出来取其中最大的一个去minimize他，但是这显然不可行。所以不同DRO的papers就关注于怎么获得这个distribution以估计目前训练集中最能最大化Loss的子集。
 
-这篇paper把原模型和maximizer看成一场零和博弈的两位玩家，提出Parametric-DRO (P-DRO)。主要贡献为：1. 直接用梯度下降更新这个DRO Loss不可行（gradients太不稳定），所以提出使用KL-divergence relax maximizer的goal；2. 发现maximizer可以被用来判断两个模型的distribution robustness，进而使用它作为hyper-parameter筛选器。具体方法是把maximizer用一个生成模型q代替，q受到和真实分布的KL散度限制，并以最大化Loss为目标（其实就是GAN的思想）。但是这样做的问题是参与计算Loss的都是q生成的data，一旦和真实分布不同，那对原本模型的更新也是错误的。解决办法是使用importance sampling的技巧转化到真实分布上。但是新的问题来了，会引入真实分布的概率密度（对我们来说是不可知的）。解决办法是使用data point对q做一个极大似然估计来作为真实分布的替代。
+这篇paper把原模型和maximizer看成一场零和博弈的两位玩家，提出Parametric-DRO (P-DRO)。主要贡献为：1. 直接用梯度下降更新这个DRO Loss不可行（gradients太不稳定），所以提出使用KL-divergence relax maximizer的goal；2. 发现maximizer可以被用来判断两个模型的distribution robustness，进而使用它作为hyper-parameter筛选器。具体方法是把maximizer用一个生成模型q代替，q受到和真实分布的KL散度限制，并以最大化Loss为目标（其实就是GAN的思想）。但是这样做的问题是参与计算Loss的都是q生成的data，一旦和真实分布不同，那对原本模型的更新也是错误的。解决办法是使用importance sampling的技巧转化到真实分布上。但是新的问题来了，会引入真实分布的概率密度（对我们来说是不可知的）。解决办法是使用data point对q做一个极大似然估计来作为真实分布的替代。最后，通过对KL散度用拉格朗日松弛，把问题转变为tractable。
 
 实验做在两个Toxicity detection datasets上 (DWMW17和FDCL18)，实验发现在有group information的时候P-DRO可以获得非常好的表现。
 
@@ -33,6 +22,16 @@ L-DRO: TODO
 
 <b>2022-05-08</b><br>
 
+<i>Title</i>: <a href="https://arxiv.org/pdf/2204.06340.pdf">Distributionally Robust Models with Parametric Likelihood Ratios</a> (ICLR 2022)<br>
+<i>Author</i>: Paul Michel, Tatsunori Hashimoto, Graham Neubig<br>
+<i>Comments</i>:<br>
+继续上周对DRO topic的讨论。这篇paper是Michel对自己去年ICLR 2021工作P-DRO的一个优化，他在P-DRO基础上做了关键性的改进提出这篇RP-DRO（Ratio-based P-DRO）。DRO的Loss换个角度想救是在优化一个Worst-case Loss，而ERM是在优化Average Loss。这篇paper不直接去建模Worst-case distribution了，而是建模training distribution和Worst-case distribution之间的likelihood ratio。具体来说改进有三点：1. 对likelihood ratio加上一个normalization constraint（mini-batch level）；2. 将之前约束maximizer和真实分布之间距离的KL散度写成一个惩罚项；3. 使用simultaneous gradient update同时更新minimizer和maximizer。
+
+对P-DRO里由于importance sampling产生的概率之比这个项可以写成一个新的uncertainty set。这样做的好处是给生成模型q提供了更多选择，但是同时要加上normalization constraint，不然的话maximizer可以无限制的调大分配给每个sample的weight从而minimizer就无从优化。之前的方法把这个ratio在每步gradient update时投影回去，这篇paper提出两种normalization constraints，分别是self-normalization（把mini batch中所有ratio做平方和）以及batch-level normalization（在每个mini batch用softmax的方式做归一化）。实验发现第二种方法不需要引入新的hyper parameter，且在训练时更稳定，因此作者推荐第二种。
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2109.04020.pdf">Distributionally Robust Multilingual Machine Translation</a> (EMNLP 2021)<br>
+<i>Author</i>: Chunting Zhou, Daniel Levy, Xian Li, Marjan Ghazvininejad, Graham Neubig<br>
+<i>Comments</i>:<br>
 TODO
 
 <b>2022-05-01</b><br>
