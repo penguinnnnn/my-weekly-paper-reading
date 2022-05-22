@@ -4,6 +4,16 @@
 
 <b>2022-05-22</b><br>
 
+<i>Title</i>: <a href="https://arxiv.org/pdf/2110.05025.pdf">Self-supervised Learning is More Robust to Dataset Imbalance</a> (ICLR 2022)<br>
+<i>Author</i>: Hong Liu, Jeff Z. HaoChen, Adrien Gaidon, Tengyu Ma<br>
+<i>Comments</i>:<br>
+这篇paper发现在data imbalance的时候（即训练集中不同class的data size不同，这种情况一般随着imbalance程度的上升，总体accuracy会有所下降），如果训练方法使用self-supervised learning，准确率的下降会比使用supervised learning少很多。具体来说作者在不同dataset、不同size的training data、不同imbalance ratio（最少的class的size比上最多的class的size）、ID data和OOD data上均验证了这一现象。此外，作者还通过人工设计了一组比较简单的training data，在线性分类器上可视化了weight矩阵的vector来验证supervised learning不能找到imbalance class上有用的feature这件事（并且这个比较简单的data还有数学证明）。最后，作者在图片上设计了：frequent data左半边是和label相关，右半边是随机的其他图片；rare data右半边是和label相关，左半边是全黑。然后通过heatmap可视化CNN学到的feature可以看出，supervised在frequent data上只会关注左半边，所以在rare data上基本就挂了，而self-supervised在frequent data上左右都会关注，因此能把学到的feature generalize到rare的右半边上。还可以换个角度看这篇paper（paper里没说），就是真正造成这种差别的不是有没有监督信号，而是在使用的loss上。区别在于使用的loss是否是local或者global的。
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2106.09226.pdf">Why Do Pretrained Language Models Help in Downstream Tasks? An Analysis of Head and Prompt Tuning</a> (NeurIPS 2021)<br>
+<i>Author</i>: Colin Wei, Sang Michael Xie, Tengyu Ma<br>
+<i>Comments</i>:<br>
+这篇paper比较偏理论，他11页正文只有1页的实验，其余全是推导。他尝试用HMM (Hidden Markov Model)来建模PLM在下游任务上的head tuning（只训练一个linear head）和prompt tuning（在word embedding里插入一个额外的latent code）。作者分析了prompt能在各种下游任务上击败head tuning的原因在于他对data和模型的假设不需要head tuning那么强。具体来说，从head tuning角度，本文推导的主要目标是证明PLM对于第一个token（CLS token）预测的概率向量，即P(X_1 | X_2:T+1)，和HMM的初始隐状态H_0之间是线性变换关系。注意到在给定H_1时X_1和X_2:T+1是独立的，可以把P(X_1 | X_2:T+1)转换成P(H_1 | X_2:T+1)，再由马尔可夫性质把P(H_1 | X_2:T+1)转换到P(H_0 | X_1:T)从而得证。其中用到的假设是hidden states的状态数要小于vocabulary Size，这样可以使HMM中从H推到X的状态转移矩阵列满秩，从而他的左逆存在。但是这个假设在真的PLM中显然不满足（hidden states是float vector，状态数无限）。而prompt tuning的情况就好一些，只需要列向量的一个子集满秩，而这个子集就是包含了task specific的hidden states的集合。
+
 <b>2022-05-15</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2103.10282.pdf">Modeling the Second Player in Distributionally Robust Optimization</a> (ICLR 2021)<br>
