@@ -2,6 +2,24 @@
 
 <b>2022-05-29</b><br>
 
+<i>Title</i>: <a href="https://arxiv.org/pdf/2110.10472.pdf">Multilingual Unsupervised Neural Machine Translation with Denoising Adapters</a> (EMNLP 2021)<br>
+<i>Author</i>: Ahmet Üstün, Alexandre Berard, Laurent Besacier, Matthias Gallé<br>
+<i>Comments</i>:<br>
+这篇paper设计了一种方法在多语言预训练模型上进行一定程度的unsupervised训练（unsupervise在这篇paper中指只有单语数据，一定程度指不能安全没有parallel数据，还是需要一部分parallel数据作为auxiliary language data）。介绍他的方法前先介绍adapter这个技术。我理解上这个技术就是扩展版的head，他在encoder和decoder的各个layer后（Feed Forward层后）加上一个由【Layer Norm、下采样、ReLU、上采样】组成的模块，对比head tuning中把PLM freeze住只train head，adapter会把原PLM的参数都freeze住，只训练adapter里的参数。这篇论文用了一个两阶段法：
+
+1. 首先使用denoising adapter来训练mBART：训练目标为在单语数据上reconstruction，包括但不限于token mask、deletion、word-span mask等等。每种语言都有自己的adapter。这一步主要为了学到语言的encode和decode能力。
+
+2. 然后使用auxiliary language data来fine-tune mBART，这一步只训练decoder的Cross Attention的参数。目标为parallel data上的auto-regressive翻译，source和target语言在encoder和decoder上分别使用自己的adapter。这一步是为了让模型学到怎么使用adapter获得的representation。
+
+实验发现，单语数据量不需要非常大就能达到很好的性能（5m和20m差不多）。性能能达到和全parallel数据差不多。
+
+<i>Title</i>: <a href="https://arxiv.org/pdf/2107.01294.pdf">Is GPT-3 Text Indistinguishable from Human Text? Scarecrow: A Framework for Scrutinizing Machine Text</a> (ACL 2022 Long)<br>
+<i>Author</i>: Yao Dou, Maxwell Forbes, Rik Koncel-Kedziorski, Noah A. Smith, Yejin Choi<br>
+<i>Comments</i>:<br>
+GPT-3已经可以自己写出非常真实的文本了。很多时候人类都难以分辨自动生成的文本和人类写的文本有什么差别。这篇paper认为还是可以从很多细微的差别中判断是GPT-3自动生成的文本。本文提出了一个叫做Scarecrow的框架，包含了十种他们定义的text generation会出现的错误：语言本身有五种：语法错误、off-prompt（类似hallucination）、冗余、自相矛盾、incoherent（我理解就是没什么错误但是在胡说八道或者牛头不对马嘴）；factual错误有三种：明显数学错误（1+1=3）、事实错误（例如奥巴马是中国总统）、违背常识（太阳从北边升起）；最后两种需要进一步验证的待定型错误：分为可能需要查一查的和需要领域专业知识的句子。
+
+本文的出发点是觉得现在的task难以衡量我们直观的对text generation quality的感觉。因此将我们认为的一个文本好或不好仔细的定义成了几个类。然后像<a href="https://aclanthology.org/2020.acl-main.442/">CheckList</a> (ACL 2020 Best paper)一样的行文思路，去测试了各种GPT模型（从G比较小的PT-2 Small到最大的GPT-3 DaVinci），最后发现了41k个独立的错误。本文相比CheckList的优点是还逐个做了ablation study去检查什么factor最能导致错误，包括了parameter数量、training data数量、和各种decode策略。本文的设计很精细，但是缺点是人力消耗太大，他的每项任务其实还是通过crowdsourcing完成的。他定义的类我可以参考，但是我想通过已有的task设计自动化的测试方法以降低人力消耗。
+
 <b>2022-05-22</b><br>
 
 <i>Title</i>: <a href="https://arxiv.org/pdf/2110.05025.pdf">Self-supervised Learning is More Robust to Dataset Imbalance</a> (ICLR 2022)<br>
